@@ -1,0 +1,8 @@
+<h2>XSS Test</h2>
+<form method="POST">
+    <label>Message:</label>
+    <input name="message">
+    <button type="submit">Submit</button>
+</form>
+
+<p>Output: {{ message|safe }}</p>

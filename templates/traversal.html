@@ -1,0 +1,13 @@
+<h2>Directory Traversal</h2>
+
+<form method="get">
+    <label>Введите имя файла:</label><br>
+    <input name="file" placeholder="../../app.py" style="width:300px">
+    <button type="submit">Открыть</button>
+</form>
+
+{% if filename %}
+<hr>
+<p><b>Файл:</b> {{ filename }}</p>
+<pre>{{ content }}</pre>
+{% endif %}

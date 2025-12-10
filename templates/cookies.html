@@ -1,8 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
 <h2>Cookie Tampering</h2>
 
-<p><b>Ваш статус (role):</b> {{ role }}</p>
+<p>Ваш текущий cookie <b>role</b>:
+<code>{{ role }}</code>
+</p>
 
-<p>{{ text }}</p>
+<p>Попробуйте изменить cookie вручную (F12 → Application → Cookies):</p>
+
+<ul>
+    <li>role=user → role=admin</li>
+</ul>
+
+{% if role == "admin" %}
+<div class="alert alert-success mt-3">
+    Привилегии повышены! Добро пожаловать, администратор.
+</div>
+{% endif %}
 
 <hr>
-<p><b>Задание:</b> измените cookie <code>role</code> на <code>admin</code> через DevTools → Application → Cookies.</p>
+<h4>Объяснение</h4>
+<p>
+Cookie Tampering — изменение cookie вручную.
+Если сайт хранит важные значения (роль, ID, права) без подписи — злоумышленник может их менять.
+</p>
+<p>Так получают доступ к чужим аккаунтам и админке.</p>
+
+{% endblock %}

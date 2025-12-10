@@ -65,30 +65,19 @@ def xss():
 
 
 
-@app.route("/traversal", methods=["GET"])
+@app.route("/traversal")
 def traversal():
-    filename = request.args.get("file", "").strip()
+    filename = request.args.get("file")
 
     if not filename:
-        return render_template("traversal.html", filename=None, content=None)
+        return render_template("traversal.html")
 
     try:
-        # Безопасный путь для демонстрации (не разрешаем абсолютные пути)
-        # Но для учебной демострации мы разрешаем относительные traversal-пути.
-        # Попробуем открыть в текстовом режиме с fallback'ом.
-        try:
-            with open(filename, "r", encoding="utf-8", errors="replace") as f:
-                content = f.read()
-        except Exception:
-            # fallback: откроем в бинарном виде и отобразим первые 2000 байт в hex+repr
-            with open(filename, "rb") as f:
-                raw = f.read(2000)
-                content = ("(binary or non-utf8 file, showing first bytes)\n\n"
-                           + repr(raw))
+        with open(os.path.join("vulnerable_files", filename), "r", encoding="utf-8") as f:
+            content = f.read()
+        return render_template("traversal.html", content=content)
     except Exception as e:
-        content = f"Ошибка: {e}"
-
-    return render_template("traversal.html", filename=filename, content=content)
+        return render_template("traversal.html", error=str(e))
 
 
 UPLOAD_FOLDER = "uploads"

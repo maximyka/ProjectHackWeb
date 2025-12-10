@@ -1,9 +1,53 @@
-<h2>Учебные уязвимости</h2>
+{% extends "base.html" %}
+{% block content %}
+<h1 class="mb-4">Учебный полигон уязвимостей</h1>
 
-<ul>
-    <li><a href="/login">SQL Injection</a></li>
-    <li><a href="/xss">XSS</a></li>
-    <li><a href="/traversal">Directory Traversal</a></li>
-    <li><a href="/upload">File Upload</a></li>
-    <li><a href="/cookies">Cookie Tampering</a></li>
-</ul>
+<div class="row">
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h4>SQL Injection</h4>
+            <p>Вход без пароля через внедрение SQL.</p>
+            <a href="/login" class="btn btn-primary">Перейти</a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h4>XSS</h4>
+            <p>Отображение вредоносных скриптов.</p>
+            <a href="/xss" class="btn btn-primary">Перейти</a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h4>Directory Traversal</h4>
+            <p>Чтение файлов сервера путём обхода каталогов.</p>
+            <a href="/traversal" class="btn btn-primary">Перейти</a>
+        </div>
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h4>File Upload</h4>
+            <p>Загрузка опасных файлов на сервер.</p>
+            <a href="/upload" class="btn btn-primary">Перейти</a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h4>Cookie Tampering</h4>
+            <p>Подмена значения cookie для повышения ролей.</p>
+            <a href="/cookies" class="btn btn-primary">Перейти</a>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

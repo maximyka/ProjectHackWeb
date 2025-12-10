@@ -1,6 +1,45 @@
-<h2>SQL Injection Логин</h2>
-<form method="post">
-    <input type="text" name="username" placeholder="Логин">
-    <input type="password" name="password" placeholder="Пароль">
-    <button type="submit">Войти</button>
+{% extends "base.html" %}
+{% block content %}
+<h2>SQL Injection</h2>
+<p>Попробуйте войти, используя SQL-инъекцию: <code>' OR '1'='1</code></p>
+
+<form method="POST" class="card p-3">
+    <div class="mb-3">
+        <label>Логин</label>
+        <input type="text" name="username" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label>Пароль</label>
+        <input type="password" name="password" class="form-control">
+    </div>
+    <button class="btn btn-success">Войти</button>
 </form>
+
+{% if result %}
+<hr>
+<h4>Результат</h4>
+<p>{{ result|safe }}</p>
+
+<h4>SQL-запрос</h4>
+<pre>{{ query }}</pre>
+{% endif %}
+
+<hr>
+<h4>Объяснение</h4>
+<p>
+SQL Injection — это внедрение в запрос своего кода.
+Если система формирует запрос так:
+</p>
+<pre>SELECT * FROM users WHERE username='USER' AND password='PASS';</pre>
+
+<p>
+И злоумышленник вводит:
+</p>
+
+<pre>' OR '1'='1' --</pre>
+
+<p>
+Запрос превращается в универсальный TRUE.
+Это позволяет войти в любую учётку без пароля.
+</p>
+{% endblock %}

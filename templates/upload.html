@@ -1,12 +1,28 @@
-<h2>File Upload (Уязвимая загрузка файлов)</h2>
+{% extends "base.html" %}
+{% block content %}
+<h2>File Upload</h2>
+<p>Загрузите любой файл — сайт НЕ проверяет тип.</p>
 
-<form method="post" enctype="multipart/form-data">
-    <input type="file" name="file">
-    <button type="submit">Загрузить</button>
+<form method="POST" enctype="multipart/form-data" class="card p-3">
+    <input type="file" name="file" class="form-control">
+    <button class="btn btn-success mt-3">Загрузить</button>
 </form>
 
-{% if message %}
+{% if filename %}
 <hr>
-<p>{{ message }}</p>
-<p><a href="{{ url_for('uploaded_file', filename=filename) }}" target="_blank">Открыть файл</a></p>
+<p>Файл загружен как: <b>{{ filename }}</b></p>
 {% endif %}
+
+<hr>
+<h4>Объяснение</h4>
+<p>
+File Upload уязвимость позволяет загружать:
+</p>
+<ul>
+    <li>веб‑шеллы (.php, .asp, .jsp)</li>
+    <li>скрипты</li>
+    <li>файлы, которые сервер выполнит</li>
+</ul>
+
+<p>Это одна из самых опасных уязвимостей.</p>
+{% endblock %}

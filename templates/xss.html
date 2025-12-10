@@ -1,8 +1,31 @@
-<h2>XSS Test</h2>
-<form method="POST">
-    <label>Message:</label>
-    <input name="message">
-    <button type="submit">Submit</button>
+{% extends "base.html" %}
+{% block content %}
+<h2>Stored / Reflected XSS</h2>
+<p>Введите HTML/JS код, например: <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code></p>
+
+<form method="GET" class="card p-3">
+    <label>Ваш ввод:</label>
+    <input type="text" name="q" class="form-control">
+    <button class="btn btn-primary mt-3">Отправить</button>
 </form>
 
-<p>Output: {{ message|safe }}</p>
+{% if q %}
+<hr>
+<h4>Результат вывода:</h4>
+<div class="border p-3">
+    {{ q|safe }}
+</div>
+{% endif %}
+
+<hr>
+<h4>Объяснение</h4>
+<p>
+XSS — позволяет вставить JavaScript на страницу.
+Если сайт выводит данные без фильтрации, злоумышленник может:
+</p>
+<ul>
+    <li>украсть cookie</li>
+    <li>подменить интерфейс</li>
+    <li>выполнить свои скрипты</li>
+</ul>
+{% endblock %}

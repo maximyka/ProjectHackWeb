@@ -1,53 +1,83 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="mb-4">Учебный полигон уязвимостей</h1>
 
-<div class="row">
+<h1 class="mb-4 text-center">
+    🧪 Учебный полигон веб‑уязвимостей
+</h1>
+
+<p class="text-center text-muted mb-5">
+    Демонстрация распространённых уязвимостей веб‑приложений.
+    Все примеры реализованы намеренно небезопасно в учебных целях.
+</p>
+
+<div class="row g-4">
 
     <div class="col-md-4">
-        <div class="card p-3">
-            <h4>SQL Injection</h4>
-            <p>Вход без пароля через внедрение SQL.</p>
-            <a href="/login" class="btn btn-primary">Перейти</a>
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5><i class="bi bi-database-exclamation text-danger"></i> SQL Injection</h5>
+                <p class="text-muted">
+                    Вход в систему путём внедрения SQL‑кода вместо логина и пароля.
+                </p>
+                <a href="/login" class="btn btn-outline-danger w-100">Перейти</a>
+            </div>
         </div>
     </div>
 
     <div class="col-md-4">
-        <div class="card p-3">
-            <h4>XSS</h4>
-            <p>Отображение вредоносных скриптов.</p>
-            <a href="/xss" class="btn btn-primary">Перейти</a>
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5><i class="bi bi-code-slash text-warning"></i> XSS</h5>
+                <p class="text-muted">
+                    Выполнение вредоносного JavaScript‑кода в браузере пользователя.
+                </p>
+                <a href="/xss" class="btn btn-outline-warning w-100">Перейти</a>
+            </div>
         </div>
     </div>
 
     <div class="col-md-4">
-        <div class="card p-3">
-            <h4>Directory Traversal</h4>
-            <p>Чтение файлов сервера путём обхода каталогов.</p>
-            <a href="/traversal" class="btn btn-primary">Перейти</a>
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5><i class="bi bi-folder2-open text-primary"></i> Directory Traversal</h5>
+                <p class="text-muted">
+                    Чтение файлов сервера через управление путями к файлам.
+                </p>
+                <a href="/traversal" class="btn btn-outline-primary w-100">Перейти</a>
+            </div>
         </div>
     </div>
 
 </div>
 
-<div class="row">
+<div class="row g-4 mt-2">
 
     <div class="col-md-4">
-        <div class="card p-3">
-            <h4>File Upload</h4>
-            <p>Загрузка опасных файлов на сервер.</p>
-            <a href="/upload" class="btn btn-primary">Перейти</a>
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5><i class="bi bi-upload text-success"></i> File Upload</h5>
+                <p class="text-muted">
+                    Загрузка файлов без проверки типа и расширения.
+                </p>
+                <a href="/upload" class="btn btn-outline-success w-100">Перейти</a>
+            </div>
         </div>
     </div>
 
     <div class="col-md-4">
-        <div class="card p-3">
-            <h4>Cookie Tampering</h4>
-            <p>Подмена значения cookie для повышения ролей.</p>
-            <a href="/cookies" class="btn btn-primary">Перейти</a>
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5><i class="bi bi-cookie text-secondary"></i> Cookie Tampering</h5>
+                <p class="text-muted">
+                    Изменение cookie для получения привилегий администратора.
+                </p>
+                <a href="/cookies" class="btn btn-outline-secondary w-100">Перейти</a>
+            </div>
         </div>
     </div>
 
 </div>
+
+<hr class="my-5">
 
 {% endblock %}

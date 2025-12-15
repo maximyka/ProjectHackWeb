@@ -1,31 +1,46 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Stored / Reflected XSS</h2>
-<p>Введите HTML/JS код, например: <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code></p>
 
-<form method="GET" class="card p-3">
-    <label>Ваш ввод:</label>
-    <input type="text" name="q" class="form-control">
-    <button class="btn btn-primary mt-3">Отправить</button>
-</form>
+<h2><i class="bi bi-code-slash"></i> Cross-Site Scripting (XSS)</h2>
 
-{% if q %}
-<hr>
-<h4>Результат вывода:</h4>
-<div class="border p-3">
-    {{ q|safe }}
+<div class="card p-4 mb-4">
+    <form method="POST">
+        <textarea class="form-control mb-3" name="comment" placeholder="Введите комментарий"></textarea>
+        <button class="btn btn-warning">Отправить</button>
+    </form>
+</div>
+
+{% if comment %}
+<div class="card p-3 mb-4">
+    <h5>Комментарий:</h5>
+    {{ comment | safe }}
 </div>
 {% endif %}
 
-<hr>
-<h4>Объяснение</h4>
-<p>
-XSS — позволяет вставить JavaScript на страницу.
-Если сайт выводит данные без фильтрации, злоумышленник может:
-</p>
-<ul>
-    <li>украсть cookie</li>
-    <li>подменить интерфейс</li>
-    <li>выполнить свои скрипты</li>
-</ul>
+<div class="alert alert-danger">
+    <strong>🔴 УЯЗВИМО:</strong><br>
+    Ввод выводится без экранирования.<br>
+    Пример: <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code>
+</div>
+
+<div class="alert alert-success">
+    <strong>🟢 КАК ИСПРАВИТЬ:</strong><br>
+    <b>Для разработчика:</b><br>
+    • Никогда не выводить пользовательский ввод как HTML.<br>
+    • Убрать <code>|safe</code> и всегда экранировать ввод.<br>
+    • Разрешать только обычный текст без тегов.<br><br>
+
+    <b>Что это даёт:</b><br>
+    Злоумышленник не сможет выполнить JavaScript в браузере других пользователей и украсть данные.
+</div>
+
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="/docs/xss"
+       class="btn btn-outline-info">
+        📘 Теория уязвимости
+    </a>
+</div>
+
+
 {% endblock %}

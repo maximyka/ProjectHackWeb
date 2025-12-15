@@ -1,45 +1,62 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>SQL Injection</h2>
-<p>Попробуйте войти, используя SQL-инъекцию: <code>' OR '1'='1</code></p>
 
-<form method="POST" class="card p-3">
-    <div class="mb-3">
-        <label>Логин</label>
-        <input type="text" name="username" class="form-control">
-    </div>
-    <div class="mb-3">
-        <label>Пароль</label>
-        <input type="password" name="password" class="form-control">
-    </div>
-    <button class="btn btn-success">Войти</button>
-</form>
+<h2><i class="bi bi-database-exclamation"></i> SQL Injection</h2>
 
-{% if result %}
-<hr>
-<h4>Результат</h4>
-<p>{{ result|safe }}</p>
+<div class="card p-4 mb-4">
+    <form method="POST">
+        <input class="form-control mb-2" name="username" placeholder="Логин">
+        <input class="form-control mb-3" name="password" placeholder="Пароль">
+        <button class="btn btn-danger">Войти</button>
+    </form>
+</div>
 
-<h4>SQL-запрос</h4>
-<pre>{{ query }}</pre>
+<div class="alert alert-danger">
+    <strong>🔴 УЯЗВИМО:</strong><br>
+    Пользовательский ввод напрямую подставляется в SQL-запрос.<br>
+    Попробуйте: <code>' OR '1'='1' --</code>
+</div>
+
+<div class="alert alert-success">
+    <strong>🟢 КАК ИСПРАВИТЬ:</strong><br>
+    <b>Для разработчика:</b><br>
+    • Никогда не вставлять логин и пароль напрямую в SQL‑запрос.<br>
+    • Использовать подготовленные запросы или ORM (например, параметризированные запросы).<br>
+    • Проверять и ограничивать ввод пользователя.<br><br>
+
+    <b>Что это даёт:</b><br>
+    Пользователь не сможет изменить SQL‑запрос и получить доступ к чужим данным или войти без пароля.
+</div>
+
+
+
+{% if query %}
+<div class="card p-3 mt-4">
+    <h5>Результат:</h5>
+
+    {% if success %}
+        <div class="alert alert-success">
+            ✅ Вход выполнен (SQL-инъекция сработала)
+        </div>
+    {% else %}
+        <div class="alert alert-danger">
+            ❌ Вход не выполнен
+        </div>
+    {% endif %}
+
+    <pre>{{ query }}</pre>
+</div>
 {% endif %}
 
-<hr>
-<h4>Объяснение</h4>
-<p>
-SQL Injection — это внедрение в запрос своего кода.
-Если система формирует запрос так:
-</p>
-<pre>SELECT * FROM users WHERE username='USER' AND password='PASS';</pre>
 
-<p>
-И злоумышленник вводит:
-</p>
 
-<pre>' OR '1'='1' --</pre>
+<div class="d-flex gap-2 mb-4">
 
-<p>
-Запрос превращается в универсальный TRUE.
-Это позволяет войти в любую учётку без пароля.
-</p>
+    <a href="/docs/sql_injection" class="btn btn-outline-info">
+        📖 Описание уязвимости (Markdown)
+    </a>
+</div>
+
+
+
 {% endblock %}

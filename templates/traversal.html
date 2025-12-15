@@ -1,76 +1,52 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Directory Traversal</h2>
 
-<p>
-Эта страница демонстрирует уязвимость Directory Traversal.
-Приложение позволяет открыть любой файл, который находится в папке проекта
-или выше по файловой системе, если сервер запускается с правами,
-дающими доступ к этим файлам.
-</p>
+<h2><i class="bi bi-folder2-open"></i> Directory Traversal</h2>
 
-<p>
-Попробуйте открыть, например:
-</p>
-
-<ul>
-    <li><code>../app.py</code></li>
-    <li><code>../templates/base.html</code></li>
-</ul>
-
-
-<form method="GET" class="card p-3">
-    <label>Имя файла:</label>
-    <input type="text" name="file" class="form-control" placeholder="example.txt">
-    <button class="btn btn-warning mt-3">Открыть</button>
-</form>
+<div class="card p-4 mb-4">
+    <form method="GET">
+        <input class="form-control mb-3" name="file" placeholder="Имя файла">
+        <button class="btn btn-primary">Открыть</button>
+    </form>
+</div>
 
 {% if content %}
-<hr>
-<h4>Содержимое файла:</h4>
-<pre>{{ content }}</pre>
+<pre class="bg-dark text-light p-3">{{ content }}</pre>
 {% endif %}
+
+<div class="alert alert-danger">
+    <strong>🔴 УЯЗВИМО:</strong><br>
+    Пользователь управляет путем к файлу.<br>
+    Пример: <code>../../app.py</code>
+</div>
+
+<div class="alert alert-success">
+    <strong>🟢 КАК ИСПРАВИТЬ:</strong><br>
+    <b>Для разработчика:</b><br>
+    • Запретить пользователю указывать путь к файлу полностью.<br>
+    • Разрешать доступ только к заранее заданной папке.<br>
+    • Проверять имя файла по списку разрешённых.<br><br>
+
+    <b>Что это даёт:</b><br>
+    Пользователь не сможет читать системные файлы и исходный код сайта.
+</div>
+
 
 {% if error %}
-<hr>
-<div class="alert alert-danger">{{ error }}</div>
+<div class="alert alert-danger">
+    {{ error }}
+</div>
 {% endif %}
 
-<hr>
-<h3>Объяснение уязвимости</h3>
 
-<p>
-Directory Traversal — это ошибка, при которой приложение позволяет злоумышленнику
-передавать путь к файлу напрямую в файловую систему сервера.
-</p>
 
-<p>Например:</p>
-<pre>?file=../database.db</pre>
 
-<p>
-Если сервер не ограничивает доступ, злоумышленник может читать конфигурации,
-ключи, пароли, исходный код приложения.
-</p>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="/docs/traversal"
+       class="btn btn-outline-info">
+        📘 Теория уязвимости
+    </a>
+</div>
 
-<p>
-**Почему на твоём сайте не работает <code>../../app.py</code>?**
-Потому что приложение читает файлы начиная из **корневой папки проекта**, где уже лежит <code>app.py</code>.
-Физически нет папок выше, которые содержали бы другие файлы приложения.
-</p>
-
-<p>
-В реальных приложениях Directory Traversal часто применяется так:
-</p>
-
-<ul>
-    <li><code>../../../../etc/passwd</code> — Unix</li>
-    <li><code>..\..\..\windows\win.ini</code> — Windows</li>
-    <li>доступ к логам, ключам API, исходному коду</li>
-</ul>
-
-<p>
-Но работать эта атака будет только если сервер запущен из директории,
-над которой есть нужные файлы, и сервер имеет права на их чтение.
-</p>
 
 {% endblock %}

@@ -1,28 +1,59 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>File Upload</h2>
-<p>Загрузите любой файл — сайт НЕ проверяет тип.</p>
 
-<form method="POST" enctype="multipart/form-data" class="card p-3">
-    <input type="file" name="file" class="form-control">
-    <button class="btn btn-success mt-3">Загрузить</button>
-</form>
+<h2><i class="bi bi-upload"></i> File Upload</h2>
+
+<div class="card p-4 mb-4">
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" class="form-control mb-3" name="file">
+        <button class="btn btn-success">Загрузить</button>
+    </form>
+</div>
 
 {% if filename %}
-<hr>
-<p>Файл загружен как: <b>{{ filename }}</b></p>
+<div class="alert alert-warning">
+    Файл загружен: <b>{{ filename }}</b>
+</div>
 {% endif %}
 
-<hr>
-<h4>Объяснение</h4>
-<p>
-File Upload уязвимость позволяет загружать:
-</p>
-<ul>
-    <li>веб‑шеллы (.php, .asp, .jsp)</li>
-    <li>скрипты</li>
-    <li>файлы, которые сервер выполнит</li>
-</ul>
+<div class="alert alert-danger">
+    <strong>🔴 УЯЗВИМО:</strong><br>
+    Нет проверки расширения и типа файла.<br>
+    Возможна загрузка веб-шелла.
+</div>
 
-<p>Это одна из самых опасных уязвимостей.</p>
+<div class="alert alert-success">
+    <strong>🟢 КАК ИСПРАВИТЬ:</strong><br>
+    <b>Для разработчика:</b><br>
+    • Разрешать загрузку только нужных типов файлов (например, .jpg, .png).<br>
+    • Проверять расширение и тип файла на сервере.<br>
+    • Хранить загруженные файлы вне папки сайта.<br><br>
+
+    <b>Что это даёт:</b><br>
+    Злоумышленник не сможет загрузить вредоносный файл и выполнить его на сервере.
+</div>
+
+
+
+{% if filename %}
+<div class="alert alert-info">
+    📂 Файл доступен по ссылке:
+    <a href="/uploads/{{ filename }}" target="_blank">
+        /uploads/{{ filename }}
+    </a>
+</div>
+{% endif %}
+
+
+
+
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="/docs/file_upload"
+       class="btn btn-outline-info">
+        📘 Теория уязвимости
+    </a>
+</div>
+
+
 {% endblock %}

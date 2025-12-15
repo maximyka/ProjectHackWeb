@@ -1,11 +1,16 @@
-from flask import Flask, request, render_template
-from flask import make_response
-from flask import send_from_directory
+from flask import (
+    Flask, request, render_template,
+    abort, make_response, send_from_directory, send_file
+)
 import sqlite3
-
+import markdown
 import os
 
 app = Flask(__name__)
+
+# ======================
+# DATABASE
+# ======================
 
 def init_db():
     conn = sqlite3.connect('database.db')
@@ -17,25 +22,65 @@ def init_db():
             password TEXT
         )
     """)
-    cur.execute("INSERT OR IGNORE INTO users (id, username, password) VALUES (1, 'admin', 'admin123')")
+    cur.execute(
+        "INSERT OR IGNORE INTO users (id, username, password) VALUES (1, 'admin', 'admin123')"
+    )
     conn.commit()
     conn.close()
 
 init_db()
 
+# ======================
+# INDEX
+# ======================
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
+# ======================
+# MARKDOWN DOCS
+# ======================
 
+@app.route("/docs/<vuln>")
+def docs(vuln):
+    path = f"static/md/{vuln}.md"
+
+    if not os.path.exists(path):
+        abort(404)
+
+    with open(path, encoding="utf-8") as f:
+        md_text = f.read()
+
+    html = markdown.markdown(
+        md_text,
+        extensions=["fenced_code", "tables"]
+    )
+
+    return render_template(
+        "docs.html",
+        content=html,
+        title=vuln.upper()
+    )
+
+@app.route("/sources")
+def sources():
+    return render_template("sources.html")
+
+
+# ======================
+# SQL INJECTION
+# ======================
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    result = None
+    query = None
+    success = False
+
     if request.method == "POST":
         user = request.form.get("username", "")
         pwd = request.form.get("password", "")
 
-        # ⚠ УЯЗВИМЫЙ SQL (только для учебного полигона)
         query = f"SELECT * FROM users WHERE username='{user}' AND password='{pwd}';"
 
         conn = sqlite3.connect("database.db")
@@ -43,42 +88,62 @@ def login():
         try:
             cur.execute(query)
             result = cur.fetchone()
+            success = bool(result)
         except Exception as e:
-            result = None
-            return f"<b>SQL Error:</b><br>{e}<br><br><b>Query:</b><br>{query}"
-
+            result = str(e)
         conn.close()
 
-        if result:
-            return f"<h3>Вход успешен!</h3><p>Добро пожаловать, {user}</p><br>Таков запрос:<br><code>{query}</code>"
-        else:
-            return f"<h3>Неверный логин/пароль</h3></p><br>Таков запрос:<br><code>{query}</code>"
+    return render_template(
+        "login.html",
+        success=success,
+        query=query
+    )
 
-    return render_template("login.html")
+# ======================
+# XSS
+# ======================
 
 @app.route("/xss", methods=["GET", "POST"])
 def xss():
-    message = ""
+    comment = None
     if request.method == "POST":
-        message = request.form.get("message", "")
-    return render_template("xss.html", message=message)
+        comment = request.form.get("comment", "")
+    return render_template("xss.html", comment=comment)
 
-
+# ======================
+# DIRECTORY TRAVERSAL
+# ======================
 
 @app.route("/traversal")
 def traversal():
+    base_dir = "safe_files/"
     filename = request.args.get("file")
 
     if not filename:
         return render_template("traversal.html")
 
+    filepath = os.path.join(base_dir, filename)
+
+    if not os.path.exists(filepath):
+        return render_template("traversal.html", error="Файл не найден")
+
+    if filepath.lower().endswith((".png", ".jpg", ".jpeg", ".gif")):
+        return send_file(filepath)
+
     try:
-        with open(os.path.join("vulnerable_files", filename), "r", encoding="utf-8") as f:
+        with open(filepath, "r", encoding="utf-8") as f:
             content = f.read()
-        return render_template("traversal.html", content=content)
+        return render_template(
+            "traversal.html",
+            content=content,
+            filename=filename
+        )
     except Exception as e:
         return render_template("traversal.html", error=str(e))
 
+# ======================
+# FILE UPLOAD
+# ======================
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -87,39 +152,40 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def upload():
     message = None
     filename = None
+
     if request.method == "POST":
         file = request.files.get("file")
         if file and file.filename:
-            # Сохраняем файл как есть (для учебного полигона)
             filename = file.filename
-            filepath = os.path.join(UPLOAD_FOLDER, filename)
-            file.save(filepath)
-            message = f"Файл сохранён: {filename}"
+            file.save(os.path.join(UPLOAD_FOLDER, filename))
+            message = f"Файл загружен: {filename}"
+
     return render_template("upload.html", message=message, filename=filename)
 
-# Маршрут для отдачи загруженных файлов
 @app.route("/uploads/<path:filename>")
 def uploaded_file(filename):
-    # Отдаём файл из папки uploads
     return send_from_directory(UPLOAD_FOLDER, filename)
 
+# ======================
+# COOKIE TAMPERING
+# ======================
 
 @app.route("/cookies")
 def cookies_demo():
-    role = request.cookies.get("role")
-
-    if not role:
-        role = "user"
+    role = request.cookies.get("role", "user")
 
     if role == "admin":
-        text = "Вы администратор! Вам доступна секретная информация."
+        text = "Вы администратор! Доступ открыт."
     else:
-        text = "Статус: обычный пользователь. Попробуйте изменить куки!"
+        text = "Обычный пользователь. Попробуйте изменить cookie role."
 
-    resp = make_response(render_template("cookies.html", role=role, text=text))
-    resp.set_cookie("role", role)  # важно!
+    resp = make_response(
+        render_template("cookies.html", role=role, text=text)
+    )
+    resp.set_cookie("role", role)
     return resp
 
+# ======================
 
 if __name__ == "__main__":
     app.run(debug=True)

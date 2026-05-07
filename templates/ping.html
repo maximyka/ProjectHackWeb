@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2><i class="bi bi-terminal"></i> Command Injection</h2>
+
+<div class="card p-4 mb-4">
+
+    <form>
+        <div class="mb-3">
+            <label class="form-label">Host</label>
+
+            <input name="host"
+                   class="form-control"
+                   placeholder="127.0.0.1">
+        </div>
+
+        <button class="btn btn-warning">
+            Execute
+        </button>
+    </form>
+
+</div>
+
+<div class="alert alert-danger">
+    <strong>🔴 УЯЗВИМО:</strong><br>
+    Пользовательский ввод попадает в shell-команду.<br>
+    Возможна удалённая команда на сервере.
+</div>
+
+<div class="alert alert-success">
+    <strong>🟢 КАК ИСПРАВИТЬ:</strong><br>
+
+    <b>Для разработчика:</b><br>
+    • Не использовать <code>shell=True</code><br>
+    • Валидировать ввод.<br>
+    • Использовать allow-list символов.<br><br>
+
+    <b>Что это даёт:</b><br>
+    Атакующий не сможет выполнять команды ОС.
+</div>
+
+<div class="alert alert-warning">
+    🔒 Попробуйте payload:
+    <code>127.0.0.1;ls</code>
+</div>
+
+<div class="card p-4 mb-3">
+    <h5>Executed command:</h5>
+
+    <code>{{ command }}</code>
+</div>
+
+<div class="card p-4 mb-4">
+    <h5>Output:</h5>
+
+    <pre>{{ output }}</pre>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="/docs/command_injection"
+       class="btn btn-outline-info">
+        📘 Теория уязвимости
+    </a>
+</div>
+
+{% endblock %}

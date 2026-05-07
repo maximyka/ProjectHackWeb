@@ -1,10 +1,12 @@
 from flask import (
     Flask, request, render_template,
-    abort, make_response, send_from_directory, send_file
+    abort, make_response, send_from_directory, send_file, 
+    redirect
 )
 import sqlite3
 import markdown
 import os
+import subprocess
 
 app = Flask(__name__)
 
@@ -25,6 +27,11 @@ def init_db():
     cur.execute(
         "INSERT OR IGNORE INTO users (id, username, password) VALUES (1, 'admin', 'admin123')"
     )
+    
+    cur.execute(
+        "INSERT OR IGNORE INTO users (id, username, password) VALUES (2, 'john', 'John private info')"
+    )
+
     conn.commit()
     conn.close()
 
@@ -186,6 +193,109 @@ def cookies_demo():
     return resp
 
 # ======================
+# IDOR
+# ======================
+
+@app.route("/profile/<int:user_id>")
+def profile(user_id):
+    conn = sqlite3.connect("database.db")
+    cur = conn.cursor()
+
+    cur.execute("SELECT username, password FROM users WHERE id=?", (user_id,))
+    user = cur.fetchone()
+
+    conn.close()
+
+    if not user:
+        return "Пользователь не найден"
+
+    return render_template(
+        "profile.html",
+        username=user[0],
+        password=user[1],
+        user_id=user_id
+    )
+
+
+# ======================
+# COMMAND INJECTION
+# ======================
+
+@app.route("/ping")
+def ping():
+    host = request.args.get("host", "127.0.0.1")
+
+    command = f"ping -c 1 {host}"
+
+    try:
+        output = subprocess.check_output(
+            command,
+            shell=True,
+            text=True
+        )
+    except Exception as e:
+        output = str(e)
+
+    return render_template(
+        "ping.html",
+        command=command,
+        output=output
+    )
+
+# ======================
+# OPEN REDIRECT
+# ======================
+
+@app.route("/redirect")
+def open_redirect():
+    next_url = request.args.get("next", "/")
+    return redirect(next_url)
+
+
+# ======================
+# INFORMATION DISCLOSURE
+# ======================
+
+@app.route("/debug-info")
+def debug_info():
+    env = dict(os.environ)
+
+    return render_template(
+        "debug.html",
+        env=env
+    )
+
+# ======================
+# WEAK PASSWORD RESET
+# ======================
+
+@app.route("/reset-password", methods=["GET", "POST"])
+def reset_password():
+    message = None
+
+    if request.method == "POST":
+        username = request.form.get("username")
+        code = request.form.get("code")
+
+        if code == "1234":
+            message = f"Пароль пользователя {username} успешно сброшен"
+        else:
+            message = "Неверный код"
+
+    return render_template(
+        "reset.html",
+        message=message
+    )
+
+# ======================
+# REDIRECT
+# ======================
+
+@app.route("/redirect-demo")
+def redirect_demo():
+    return render_template("redirect.html")
+
+# ======================
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=4000, debug=True)

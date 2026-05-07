@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2><i class="bi bi-bug"></i> Information Disclosure</h2>
+
+<div class="card p-4 mb-4">
+    <p>Сервер раскрыл внутренние данные приложения.</p>
+</div>
+
+<div class="alert alert-danger">
+    <strong>🔴 УЯЗВИМО:</strong><br>
+    Debug-информация доступна обычному пользователю.
+</div>
+
+<div class="alert alert-success">
+    <strong>🟢 КАК ИСПРАВИТЬ:</strong><br>
+
+    <b>Для разработчика:</b><br>
+    • Отключать debug mode в production.<br>
+    • Не показывать ENV и stack trace.<br>
+    • Логировать ошибки только на сервере.<br><br>
+
+    <b>Что это даёт:</b><br>
+    Атакующий не узнает внутреннее устройство системы.
+</div>
+
+<div class="alert alert-warning">
+    🔒 Ниже показана утечка ENV-переменных.
+</div>
+
+<div class="card p-4 mb-4">
+    <pre>{{ env }}</pre>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="/docs/information_disclosure"
+       class="btn btn-outline-info">
+        📘 Теория уязвимости
+    </a>
+</div>
+
+{% endblock %}
